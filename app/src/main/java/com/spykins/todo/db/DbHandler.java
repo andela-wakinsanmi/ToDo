@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.spykins.todo.TodoApp;
 import com.spykins.todo.constant.DbConstant;
 import com.spykins.todo.model.Todo;
 
@@ -107,6 +108,37 @@ public class DbHandler extends SQLiteOpenHelper {
             cursorHandle.moveToNext();
         }
         return todoList;
+    }
+
+    public Set<Long> getAllTheTimeInDb() {
+        if(allTheTimeInDb.size() == 0) {
+            TodoApp.getDbHandler().readAllTodoInDb(false);
+        }
+        return allTheTimeInDb;
+    }
+
+    public ArrayList<Todo> getAllTodoInTIme(long time) {
+        SQLiteDatabase db = getReadableDatabase();
+        ArrayList<Todo> todoList;
+        String query = "SELECT * FROM "
+                + DbConstant.TODO_TABLE +
+                " WHERE " + DbConstant.TODO_COLUMN_TODO_TIME + " = " + time ;
+        Cursor cursorHandle = db.rawQuery(query, null);
+        todoList = loopThroughCursor(cursorHandle);
+        //update it's viewed
+        Collections.sort(todoList);
+        return todoList;
+    }
+
+    public void deleteTodoFromDb(Todo todo) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        String query = "DELETE FROM " + DbConstant.TODO_TABLE +
+                " WHERE " + DbConstant.TODO_COLUMN_TODO_TITLE +" = '" + todo.getTodoTitle() +"'"
+                + " AND " + DbConstant.TODO_COLUMN_TODO_DESCRIPTION +" = '" + todo.getTodoDescription() +"'"
+                + " AND " + DbConstant.TODO_COLUMN_TODO_TIME + " = " + todo.getTodoTime();
+        db.execSQL(query);
+
     }
 
 }
