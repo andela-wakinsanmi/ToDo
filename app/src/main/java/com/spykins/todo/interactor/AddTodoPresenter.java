@@ -28,12 +28,22 @@ public class AddTodoPresenter {
         long time = computeTimeInMillis(year, month, dayOfMonth, hour, minute);
         long currentTime = System.currentTimeMillis();
 
-        //delete
+        if(year == 0 || month == 0 || dayOfMonth == 0 || hour == 0 || minute == 0 ) {
+            if (addNewTodoInterface.get() != null) {
+                addNewTodoInterface.get().reportError("Set The Date");
+            }
+            return;
+        }
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(time);
-        if (description.isEmpty() || title.isEmpty()) {
-            addNewTodoInterface.get().reportError("Please type in text");
-            return;
+
+        if (addNewTodoInterface.get() != null) {
+            if(description.isEmpty() || title.isEmpty()) {
+                addNewTodoInterface.get().reportError("Please type in text");
+                return;
+            }
+
         }
 
         Todo todo = new Todo(title, time, description, currentTime - time, false);
@@ -51,6 +61,7 @@ public class AddTodoPresenter {
         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
+
         return calendar.getTimeInMillis();
     }
 
