@@ -25,9 +25,10 @@ public class TodoApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        context = this;
-        sharedPreferences = getSharedPreferences(TODO_PREF, MODE_PRIVATE);
         dbHandler = DbHandler.getInstance(this);
+        sharedPreferences = getSharedPreferences(TODO_PREF, MODE_PRIVATE);
+        context = this;
+
     }
 
     public static DbHandler getDbHandler() {
@@ -37,23 +38,40 @@ public class TodoApp extends Application {
     private static void setAlarm(Context context, Long time) {
         Intent intent = new Intent(context, TodoAlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
-    }
 
-    public static Context getContext() {
-        return context;
+        if(time > System.currentTimeMillis()) {
+            alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+        }
     }
 
     public static void setTimeInPreference(long time) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putLong(LEAST_TIME_IN_TODO,time);
         editor.apply();
+        updateAlarmToNewTime(time);
     }
 
     public static long getTimeInSharedPreference() {
         long time = sharedPreferences.getLong(LEAST_TIME_IN_TODO, 0L);
         return time;
+    }
+
+    public static Context getContext() {
+        return context;
+    }
+    public static void updateAlarmToNewTime(long time) {
+        cancelAlarm();
+        setAlarm(context,time);
+    }
+
+    //error... fix
+    public static void cancelAlarm() {
+        if(alarmManager != null) {
+            Intent intent = new Intent(context, TodoAlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            alarmManager.cancel(pendingIntent);
+        }
     }
 
 }
