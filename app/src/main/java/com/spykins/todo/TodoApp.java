@@ -5,6 +5,7 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import com.spykins.todo.db.DbHandler;
 import com.spykins.todo.receiver.TodoAlarmReceiver;
@@ -15,12 +16,17 @@ import com.spykins.todo.receiver.TodoAlarmReceiver;
 public class TodoApp extends Application {
     private static DbHandler dbHandler;
     private static AlarmManager alarmManager;
+    private static SharedPreferences sharedPreferences;
+    private static final String LEAST_TIME_IN_TODO = "LEAST_TIME_IN_TODO";
+    private static final String TODO_PREF = "TODO_PREF";
+
     private static Context context;
 
     @Override
     public void onCreate() {
         super.onCreate();
         context = this;
+        sharedPreferences = getSharedPreferences(TODO_PREF, MODE_PRIVATE);
         dbHandler = DbHandler.getInstance(this);
     }
 
@@ -37,6 +43,17 @@ public class TodoApp extends Application {
 
     public static Context getContext() {
         return context;
+    }
+
+    public static void setTimeInPreference(long time) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(LEAST_TIME_IN_TODO,time);
+        editor.apply();
+    }
+
+    public static long getTimeInSharedPreference() {
+        long time = sharedPreferences.getLong(LEAST_TIME_IN_TODO, 0L);
+        return time;
     }
 
 }
