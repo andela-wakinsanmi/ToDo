@@ -31,35 +31,19 @@ public class AddTodoPresenter {
         long time = computeTimeInMillis(year, month, dayOfMonth, hour, minute);
         long currentTime = System.currentTimeMillis();
 
-        if(year == 2000 || month == 2000 || dayOfMonth ==2000 ) {
-            if (addNewTodoInterface.get() != null) {
-                addNewTodoInterface.get().reportError("Set The Date", "ResetDate");
-            }
-            return;
-
-        } else if (hour == 2000 || minute == 2000) {
-            if (addNewTodoInterface.get() != null) {
-                addNewTodoInterface.get().reportError("Set The Time", "ResetTime");
-            }
-            return;
-        }
-
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(time);
 
-        if (addNewTodoInterface.get() != null) {
-            if(isTodayDate) {
-                if (time < currentTime) {
-                    addNewTodoInterface.get().reportError("Time is in the past", "Reset Time");
-                    return;
-                }
-            }
+        if(isDescriptionAndTitleEmpty(description,title)) {
+            return;
+        }
 
-            if(description.isEmpty() || title.isEmpty()) {
-                addNewTodoInterface.get().reportError("Please type in text","");
-                return;
-            }
+        if(!isTimeValid(time,currentTime)) {
+            return;
+        }
 
+        if (!isTimeProperlySet(year,month,dayOfMonth,hour,minute)) {
+            return;
         }
 
         Todo todo = new Todo(title, time, description, currentTime - time, false);
@@ -69,6 +53,45 @@ public class AddTodoPresenter {
             addNewTodoInterface.get().successfullyCreated();
         }
 
+    }
+
+    private boolean isTimeValid(long time, long currentTime) {
+        if (addNewTodoInterface.get() != null) {
+            if(isTodayDate) {
+                if (time < currentTime) {
+                    addNewTodoInterface.get().reportError("Time is in the past", "Reset Time");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isDescriptionAndTitleEmpty(String description, String title) {
+        if (addNewTodoInterface.get() != null) {
+            if(description.isEmpty() || title.isEmpty()) {
+                addNewTodoInterface.get().reportError("Please type in text","");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isTimeProperlySet(int year, int month, int dayOfMonth, int hour, int minute) {
+        if(year == 2000 || month == 2000 || dayOfMonth ==2000 ) {
+            if (addNewTodoInterface.get() != null) {
+                addNewTodoInterface.get().reportError("Set The Date", "ResetDate");
+            }
+            return false;
+
+        } else if (hour == 2000 || minute == 2000) {
+            if (addNewTodoInterface.get() != null) {
+                addNewTodoInterface.get().reportError("Set The Time", "ResetTime");
+            }
+            return false;
+        }
+        return true;
     }
 
     private void setUpInPreference(Long time) {
