@@ -44,11 +44,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
         titleTextView.setText(todo.getTodoTitle());
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(todo.getTodoTime());
-        //timeTextView.setText(calendar.getTime().toString());
-        timeTextView.setText(todo.getTodoTime() + " and date " + calendar.getTime().toString());
-
-
-
+        timeTextView.setText(calendar.getTime().toString());
     }
 
     @Override
