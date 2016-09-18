@@ -70,14 +70,30 @@ public class DbHandler extends SQLiteOpenHelper {
 
     }
 
-    public ArrayList<Todo> readAllTodoInDb() {
-        ArrayList<Todo> todoList = new ArrayList<>();
+    public ArrayList<Todo> readAllTodoInDb(boolean isPendingTodo) {
+        ArrayList<Todo> todoList;
         SQLiteDatabase db = getReadableDatabase();
-        String query = "SELECT * FROM " + DbConstant.TODO_TABLE + " ORDER BY " +
-                DbConstant.TODO_COLUMN_TODO_TIME + " ASC";
+        String query = "";
 
+        if(isPendingTodo) {
+            query = "SELECT * FROM " + DbConstant.TODO_TABLE + " WHERE "
+                    + DbConstant.TODO_COLUMN_TODO_TIME + " >= " + System.currentTimeMillis()
+                    + " ORDER BY " + DbConstant.TODO_COLUMN_TODO_TIME + " ASC";
+
+        } else {
+            query = "SELECT * FROM " + DbConstant.TODO_TABLE + " ORDER BY " +
+                    DbConstant.TODO_COLUMN_TODO_TIME + " ASC";
+        }
         Cursor cursorHandle = db.rawQuery(query, null);
+        todoList = loopThroughCursor(cursorHandle);
+        cursorHandle.close();
+        if(todoList.size() >1) Collections.sort(todoList);
+        return todoList;
 
+    }
+
+    private ArrayList<Todo> loopThroughCursor(Cursor cursorHandle) {
+        ArrayList<Todo> todoList = new ArrayList<>();
         cursorHandle.moveToFirst();
         while (!cursorHandle.isAfterLast()) {
 
@@ -90,11 +106,7 @@ public class DbHandler extends SQLiteOpenHelper {
             todoList.add(new Todo(todoTitle,todoTime,todoDescription,todoBefore,hasShown));
             cursorHandle.moveToNext();
         }
-
-        cursorHandle.close();
-        if(todoList.size() >1) Collections.sort(todoList);
         return todoList;
-
     }
 
 }
