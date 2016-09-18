@@ -31,7 +31,13 @@ public class AddTodoPresenter {
         long time = computeTimeInMillis(year, month, dayOfMonth, hour, minute);
         long currentTime = System.currentTimeMillis();
 
-        if(year == 0 || month == 0 || dayOfMonth == 0 || hour == 0 || minute == 0 ) {
+        if(year == 2000 || month == 2000 || dayOfMonth ==2000 ) {
+            if (addNewTodoInterface.get() != null) {
+                addNewTodoInterface.get().reportError("Set The Date", "ResetDate");
+            }
+            return;
+
+        } else if (hour == 2000 || minute == 2000) {
             if (addNewTodoInterface.get() != null) {
                 addNewTodoInterface.get().reportError("Set The Time", "ResetTime");
             }
@@ -42,18 +48,37 @@ public class AddTodoPresenter {
         calendar.setTimeInMillis(time);
 
         if (addNewTodoInterface.get() != null) {
+            if(isTodayDate) {
+                if (time < currentTime) {
+                    addNewTodoInterface.get().reportError("Time is in the past", "Reset Time");
+                    return;
+                }
+            }
+
             if(description.isEmpty() || title.isEmpty()) {
                 addNewTodoInterface.get().reportError("Please type in text","");
                 return;
             }
+
         }
 
         Todo todo = new Todo(title, time, description, currentTime - time, false);
         TodoApp.getDbHandler().insertTodoIntoDb(todo);
+        setUpInPreference(time);
         if (addNewTodoInterface.get() != null) {
             addNewTodoInterface.get().successfullyCreated();
         }
 
+    }
+
+    private void setUpInPreference(Long time) {
+        Long savedInSharedPreference = TodoApp.getTimeInSharedPreference();
+        //bug
+        if(savedInSharedPreference < System.currentTimeMillis()) {
+            TodoApp.setTimeInPreference(time);
+        } else if( savedInSharedPreference.compareTo(time) > 0) {
+            TodoApp.setTimeInPreference(time);
+        }
     }
 
     private long computeTimeInMillis(int year, int month, int dayOfMonth, int hour, int minute) {

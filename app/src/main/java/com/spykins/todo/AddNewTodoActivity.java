@@ -22,7 +22,8 @@ public class AddNewTodoActivity extends AppCompatActivity implements TimePickerD
     private Button dateButton, timeButton;
     private EditText titleText, descriptionText;
     private AddTodoPresenter presenter;
-    private int hour, minute, day, month, year = 0;
+    private int hour, minute = 2000;
+    private int day, month, year = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
