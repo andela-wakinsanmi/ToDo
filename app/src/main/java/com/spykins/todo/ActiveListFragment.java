@@ -50,7 +50,7 @@ public class ActiveListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        ArrayList<Todo> todoList = TodoApp.getDbHandler().readAllTodoInDb();
+        ArrayList<Todo> todoList = TodoApp.getDbHandler().readAllTodoInDb(true);
         if (todoList.size() == 0) {
             textView.setVisibility(View.VISIBLE);
         } else {
