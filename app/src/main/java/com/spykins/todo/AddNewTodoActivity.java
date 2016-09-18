@@ -3,7 +3,6 @@ package com.spykins.todo;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -40,7 +39,9 @@ public class AddNewTodoActivity extends AppCompatActivity implements TimePickerD
     }
 
     public void onSaveButtonClicked(View view) {
-
+        String title = titleText.getText().toString();
+        String description = descriptionText.getText().toString();
+        presenter.createTodo(title,description,year,month,day,hour,minute);
     }
 
     public void pickDateClicked(View view) {
@@ -64,11 +65,14 @@ public class AddNewTodoActivity extends AppCompatActivity implements TimePickerD
 
     @Override
     public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
-
-        dateButton.setText(dayOfMonth + " / " + month + " / " + year);
-        this.day = dayOfMonth;
-        this.month = month;
-        this.year = year;
+        if (presenter.isDateValid(year, month, dayOfMonth)) {
+            displaySnackBar("The Date is in the past", "actionDate");
+        } else {
+            dateButton.setText(dayOfMonth + " / " + month + " / " + year);
+            this.day = dayOfMonth;
+            this.month = month;
+            this.year = year;
+        }
 
     }
 
@@ -86,13 +90,16 @@ public class AddNewTodoActivity extends AppCompatActivity implements TimePickerD
 
 
     @Override
-    public void reportError(String error) {
-        displaySnackBar(error);
+    public void reportError(String displayText, String actionText) {
+        displaySnackBar(displayText,actionText);
     }
 
-    private void displaySnackBar(String textToDisplay) {
-        Snackbar.make(findViewById(R.id.rootView), textToDisplay, Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
+    private void displaySnackBar(String displayText, String actionText) {
+        Snackbar.make(findViewById(R.id.rootView), displayText, Snackbar.LENGTH_LONG)
+                .setAction(actionText, actionText.contains("Date")
+                        ? AddNewTodoActivity.this::pickDateClicked
+                        : AddNewTodoActivity.this::pickTimeClicked)
+                .show();
     }
 
 }

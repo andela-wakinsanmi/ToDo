@@ -5,5 +5,5 @@ package com.spykins.todo.view_interface;
  */
 public interface AddNewTodoInterface {
     void successfullyCreated();
-    void reportError(String error);
+    void reportError(String displayText, String actionText);
 }

@@ -8,6 +8,7 @@ import com.spykins.todo.view_interface.AddNewTodoInterface;
 
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Spykins on 18/09/16.
@@ -15,6 +16,8 @@ import java.util.Calendar;
 public class AddTodoPresenter {
     private WeakReference<AddNewTodoInterface> addNewTodoInterface;
     private Context context;
+    private boolean isTodayDate;
+
 
 
     public AddTodoPresenter(AddNewTodoInterface addNewTodoInterface) {
@@ -30,7 +33,7 @@ public class AddTodoPresenter {
 
         if(year == 0 || month == 0 || dayOfMonth == 0 || hour == 0 || minute == 0 ) {
             if (addNewTodoInterface.get() != null) {
-                addNewTodoInterface.get().reportError("Set The Date");
+                addNewTodoInterface.get().reportError("Set The Time", "ResetTime");
             }
             return;
         }
@@ -40,10 +43,9 @@ public class AddTodoPresenter {
 
         if (addNewTodoInterface.get() != null) {
             if(description.isEmpty() || title.isEmpty()) {
-                addNewTodoInterface.get().reportError("Please type in text");
+                addNewTodoInterface.get().reportError("Please type in text","");
                 return;
             }
-
         }
 
         Todo todo = new Todo(title, time, description, currentTime - time, false);
@@ -63,6 +65,17 @@ public class AddTodoPresenter {
         calendar.set(Calendar.MINUTE, minute);
 
         return calendar.getTimeInMillis();
+    }
+
+    public boolean isDateValid(int year, int month, int dayOfMonth) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH,month);
+        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        Date date = calendar.getTime();
+        Date date1 = new Date();
+        isTodayDate = date.compareTo(date1) == 0;
+        return date1.compareTo(date) == 1;
     }
 
 }
